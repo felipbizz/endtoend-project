@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    ports:
+      - "5432:5432"
+
+  mage:
+    build:
+      context: ./mage
+    volumes:
+      - ./mage:/usr/local/etc/mage
+    depends_on:
+      - postgres
+
+  fastapi:
+    build:
+      context: ./fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  streamlit:
+    build:
+      context: ./streamlit
+    ports:
+      - "8501:8501"
+    depends_on:
+      - fastapi
+
+  jupyter:
+    build:
+      context: ./jupyter
+    ports:
+      - "8888:8888"
