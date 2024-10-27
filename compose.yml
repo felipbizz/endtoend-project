@@ -1,18 +1,39 @@
 services:
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    ports:
-      - "5432:5432"
-
   mage:
-    build:
-      context: ./mage
-    volumes:
-      - ./mage:/usr/local/etc/mage
+    image: mageai/mageai:0.9.74
+    container_name: magic
     depends_on:
       - postgres
+    command: mage start magic
+    env_file:
+      - .env
+    environment:
+      ENV: dev
+      POSTGRES_DB: ${POSTGRES_SCHEMA}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      PG_HOST_PORT: ${PG_HOST_PORT}
+    ports:
+      - 6789:6789
+    volumes:
+      - .:/home/src/
+    restart: on-failure:5
+  
+  postgres:
+    image: postgres:17.0
+    restart: on-failure
+    container_name: postgres-magic
+    build:
+      context: ./db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${PG_HOST_PORT}:5432"
 
   fastapi:
     build:
