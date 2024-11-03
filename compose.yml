@@ -18,6 +18,7 @@ services:
       - 6789:6789
     volumes:
       - ./mage:/home/src/
+      - ./dataset_inmet:/home/src/datasets
     restart: on-failure:5
 
   postgres:
@@ -47,6 +48,7 @@ services:
       - "${PORTA_JUPYTER}:${PORTA_JUPYTER}"
     volumes:
       - ./jupyter:/home
+      - ./dataset_inmet:/home/datasets
 
   streamlit:
     container_name: streamlit
